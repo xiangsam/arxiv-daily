@@ -1,37 +1,56 @@
-from llama_cpp import Llama
-from openai import OpenAI
-from loguru import logger
+import requests
+import json
+import time
+from typing import Optional
 
 GLOBAL_LLM = None
 
 class LLM:
-    def __init__(self, api_key: str = None, base_url: str = None, model: str = None):
-        if api_key:
-            self.llm = OpenAI(api_key=api_key, base_url=base_url)
-        else:
-            self.llm = Llama.from_pretrained(
-                repo_id="Qwen/Qwen2.5-3B-Instruct-GGUF",
-                filename="qwen2.5-3b-instruct-q4_k_m.gguf",
-                n_ctx=5_000,
-                n_threads=4,
-                verbose=False,
-            )
-        self.model = model
+    def __init__(self, api_key: str, base_url: str, model_name: str):
+        self.max_retries = 3
+        self.wait_time = 0.2 # 等待时间（秒）
+        self.model_name = model_name
+        self.base_url = base_url + '/v1/chat/completions'
+        self._api_key = api_key
+        self._headers = {
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + api_key,
+        }
 
-    def generate(self, messages: list[dict]) -> str:
-        if isinstance(self.llm, OpenAI):
-            response = self.llm.chat.completions.create(messages=messages,temperature=0,model=self.model)
-            return response.choices[0].message.content
-        else:
-            response = self.llm.create_chat_completion(messages=messages,temperature=0)
-            return response["choices"][0]["message"]["content"]
 
-def set_global_llm(api_key: str = None, base_url: str = None, model: str = None):
+    def generate(self, messages: list[dict]) -> Optional[str]:
+        data = {
+            'model': self.model_name,
+            'apiKey': self._api_key,
+            "messages": messages,
+            "temperature": 0.0
+        }
+        retry_count = 0
+        while retry_count < self.max_retries:
+            try:
+                response = requests.post(self.base_url, headers=self._headers, data=json.dumps(data))
+                response.raise_for_status()  # 如果请求失败，将抛出HTTPError异常
+                response_data = response.json()
+                assistant_message = response_data.get('choices', [{}])[0].get('message', {}).get('content')
+                return assistant_message
+            except requests.exceptions.HTTPError as e:
+                if response.status_code == 429:
+                    print(f"遇到429错误，等待{self.wait_time}秒后重试...")
+                    time.sleep(self.wait_time)
+                    retry_count += 1
+                    if retry_count >= self.max_retries:
+                        print("达到最大重试次数，退出对话。")
+                        return None
+                else:
+                    print(f"请求失败: {e}")
+                    return None
+        return None
+
+def set_global_llm(api_key: str, base_url: str, model: str):
     global GLOBAL_LLM
-    GLOBAL_LLM = LLM(api_key=api_key, base_url=base_url, model=model)
+    GLOBAL_LLM = LLM(api_key=api_key, base_url=base_url, model_name=model)
 
 def get_llm() -> LLM:
     if GLOBAL_LLM is None:
-        logger.info("No global LLM found, creating a default one. Use `set_global_llm` to set a custom one.")
-        set_global_llm()
+        raise ValueError("请先调用set_global_llm函数初始化全局LLM对象")
     return GLOBAL_LLM

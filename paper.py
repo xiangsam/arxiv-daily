@@ -10,14 +10,54 @@ from requests.adapters import HTTPAdapter, Retry
 from loguru import logger
 import tiktoken
 from contextlib import ExitStack
+from ast import literal_eval
+
 
 
 
 class ArxivPaper:
     def __init__(self,paper:arxiv.Result):
         self._paper = paper
-        self.score = None
+        self.introduction: str = ""
+        self.conclusion: str = ""
+        self.tex: Optional[dict[str,str]] = None
+        
+        self.post_init()
     
+    def post_init(self):
+        self.tex = self.fetch_tex()
+        if self.tex is not None:
+            content = self.tex.get("all")
+            if content is None:
+                content = "\n".join(self.tex.values())
+            #remove cite
+            content = re.sub(r'~?\\cite.?\{.*?\}', '', content)
+            #remove figure
+            content = re.sub(r'\\begin\{figure\}.*?\\end\{figure\}', '', content, flags=re.DOTALL)
+            #remove table
+            content = re.sub(r'\\begin\{table\}.*?\\end\{table\}', '', content, flags=re.DOTALL)
+            #find introduction and conclusion
+            # end word can be \section or \end{document} or \bibliography or \appendix
+            match = re.search(r'\\section\{Introduction\}.*?(\\section|\\end\{document\}|\\bibliography|\\appendix|$)', content, flags=re.DOTALL)
+            if match:
+                self.introduction = match.group(0)
+            match = re.search(r'\\section\{Conclusion\}.*?(\\section|\\end\{document\}|\\bibliography|\\appendix|$)', content, flags=re.DOTALL)
+            if match:
+                self.conclusion = match.group(0)
+
+    def generate_property(self):
+        tldr_and_topic = self.get_tldr_and_topic()
+        if tldr_and_topic is not None:
+            res = literal_eval(tldr_and_topic)
+            if isinstance(res, dict):
+                self.tldr = res.get('tldr', None)
+                self.topic = res.get('topic', None)
+        self.affiliations = self.get_affiliations()
+        self.score = 1
+        if self.affiliations is not None:
+            self.score = self.get_score()
+        
+
     @property
     def title(self) -> str:
         return self._paper.title
@@ -27,16 +67,17 @@ class ArxivPaper:
         return self._paper.summary
     
     @property
-    def authors(self) -> list[str]:
+    def authors(self):
         return self._paper.authors
     
     @cached_property
-    def arxiv_id(self) -> str:
+    def arxiv_id(self):
         return re.sub(r'v\d+$', '', self._paper.get_short_id())
     
     @property
-    def pdf_url(self) -> str:
+    def pdf_url(self):
         return self._paper.pdf_url
+    
     
     @cached_property
     def code_url(self) -> Optional[str]:
@@ -62,8 +103,7 @@ class ArxivPaper:
             return None
         return repo_list['results'][0]['url']
     
-    @cached_property
-    def tex(self) -> dict[str,str]:
+    def fetch_tex(self) -> Optional[dict[str,str]]:
         with ExitStack() as stack:
             tmpdirname = stack.enter_context(TemporaryDirectory())
             file = self._paper.download_source(dirpath=tmpdirname)
@@ -79,28 +119,30 @@ class ArxivPaper:
                 return None
             
             bbl_file = [f for f in tar.getnames() if f.endswith('.bbl')]
-            match len(bbl_file) :
-                case 0:
-                    if len(tex_files) > 1:
-                        logger.debug(f"Cannot find main tex file of {self.arxiv_id} from bbl: There are multiple tex files while no bbl file.")
-                        main_tex = None
-                    else:
-                        main_tex = tex_files[0]
-                case 1:
-                    main_name = bbl_file[0].replace('.bbl','')
-                    main_tex = f"{main_name}.tex"
-                    if main_tex not in tex_files:
-                        logger.debug(f"Cannot find main tex file of {self.arxiv_id} from bbl: The bbl file does not match any tex file.")
-                        main_tex = None
-                case _:
-                    logger.debug(f"Cannot find main tex file of {self.arxiv_id} from bbl: There are multiple bbl files.")
+            if len(bbl_file) == 0:
+                if len(tex_files) > 1:
+                    logger.debug(f"Cannot find main tex file of {self.arxiv_id} from bbl: There are multiple tex files while no bbl file.")
                     main_tex = None
+                else:
+                    main_tex = tex_files[0]
+            elif len(bbl_file) == 1:
+                main_name = bbl_file[0].replace('.bbl', '')
+                main_tex = f"{main_name}.tex"
+                if main_tex not in tex_files:
+                    logger.debug(f"Cannot find main tex file of {self.arxiv_id} from bbl: The bbl file does not match any tex file.")
+                    main_tex = None
+            else:
+                logger.debug(f"Cannot find main tex file of {self.arxiv_id} from bbl: There are multiple bbl files.")
+                main_tex = None
             if main_tex is None:
                 logger.debug(f"Trying to choose tex file containing the document block as main tex file of {self.arxiv_id}")
             #read all tex files
             file_contents = {}
             for t in tex_files:
                 f = tar.extractfile(t)
+                if f is None:
+                    logger.debug(f"Failed to read {t} of {self.arxiv_id}")
+                    continue
                 content = f.read().decode('utf-8',errors='ignore')
                 #remove comments
                 content = re.sub(r'%.*\n', '\n', content)
@@ -132,39 +174,21 @@ class ArxivPaper:
                 file_contents["all"] = None
         return file_contents
     
-    @cached_property
-    def tldr(self) -> str:
-        introduction = ""
-        conclusion = ""
-        if self.tex is not None:
-            content = self.tex.get("all")
-            if content is None:
-                content = "\n".join(self.tex.values())
-            #remove cite
-            content = re.sub(r'~?\\cite.?\{.*?\}', '', content)
-            #remove figure
-            content = re.sub(r'\\begin\{figure\}.*?\\end\{figure\}', '', content, flags=re.DOTALL)
-            #remove table
-            content = re.sub(r'\\begin\{table\}.*?\\end\{table\}', '', content, flags=re.DOTALL)
-            #find introduction and conclusion
-            # end word can be \section or \end{document} or \bibliography or \appendix
-            match = re.search(r'\\section\{Introduction\}.*?(\\section|\\end\{document\}|\\bibliography|\\appendix|$)', content, flags=re.DOTALL)
-            if match:
-                introduction = match.group(0)
-            match = re.search(r'\\section\{Conclusion\}.*?(\\section|\\end\{document\}|\\bibliography|\\appendix|$)', content, flags=re.DOTALL)
-            if match:
-                conclusion = match.group(0)
-        prompt = """Given the title, abstract, introduction and the conclusion (if any) of a paper in latex format, generate a one-sentence TLDR summary:
+    def get_tldr_and_topic(self) -> Optional[str]:
+        prompt = """Given the title, abstract, introduction and the conclusion (if any) of a paper in latex format, generate a one-sentence TLDR summary. Additionally, propose one relevant search topic related to the paper's category, __CATEGORY__.
         
         \\title{__TITLE__}
         \\begin{abstract}__ABSTRACT__\\end{abstract}
         __INTRODUCTION__
         __CONCLUSION__
+
+        Response a python dict with 'tldr' and 'topic' as keys, format like "{'tldr': '...', 'topic': '...'}". Do not return any intermediate results.
         """
         prompt = prompt.replace('__TITLE__', self.title)
         prompt = prompt.replace('__ABSTRACT__', self.summary)
-        prompt = prompt.replace('__INTRODUCTION__', introduction)
-        prompt = prompt.replace('__CONCLUSION__', conclusion)
+        prompt = prompt.replace('__INTRODUCTION__', self.introduction)
+        prompt = prompt.replace('__CONCLUSION__', self.conclusion)
+        prompt = prompt.replace('__CATEGORY__', str(self._paper.categories))
 
         # use gpt-4o tokenizer for estimation
         enc = tiktoken.encoding_for_model("gpt-4o")
@@ -172,7 +196,7 @@ class ArxivPaper:
         prompt_tokens = prompt_tokens[:4000]  # truncate to 4000 tokens
         prompt = enc.decode(prompt_tokens)
         llm = get_llm()
-        tldr = llm.generate(
+        res = llm.generate(
             messages=[
                 {
                     "role": "system",
@@ -181,10 +205,9 @@ class ArxivPaper:
                 {"role": "user", "content": prompt},
             ]
         )
-        return tldr
+        return res
 
-    @cached_property
-    def affiliations(self) -> Optional[list[str]]:
+    def get_affiliations(self) -> Optional[list[str]]:
         if self.tex is not None:
             content = self.tex.get("all")
             if content is None:
@@ -215,10 +238,54 @@ class ArxivPaper:
 
             try:
                 affiliations = re.search(r'\[.*?\]', affiliations, flags=re.DOTALL).group(0)
-                affiliations = eval(affiliations)
+                affiliations = literal_eval(affiliations)
                 affiliations = list(set(affiliations))
                 affiliations = [str(a) for a in affiliations]
             except Exception as e:
                 logger.debug(f"Failed to extract affiliations of {self.arxiv_id}: {e}")
                 return None
             return affiliations
+        return None
+    
+    def get_score(self) -> float:
+        prompt = """Given the author affiliations, generate a score for the paper. Only for reference, here are my affiliations preferences list, listed higher are the ones I prefer more.
+
+        USA University list: [
+            Carnegie Mellon University,
+            University of Illinois at Urbana-Champaign,
+            University of Maryland - College Park,
+            University of California - San Diego,
+            Cornell University,
+            University of Michigan,
+            Stanford University,
+            Georgia Institute of Technology,
+            Massachusetts Institute of Technology,
+            University of California - Los Angeles,
+            University of California - Berkeley,
+            University of Massachusetts Amherst,
+            New York University,
+            University of Washington]
+        China University list: [Peking University, Tsinghua University, Hong Kong University of Science and Technology, Shanghai Jiao Tong University, Zhejiang University, Chinese Academy of Sciences]
+        Lab list: [OpenAI, Deepseek-AI, DeepMind, Meta, Google, Alibaba, Tencent, ByteDance, Microsoft, Nvidia, Huawei, Facebook, Amazon, IBM Watson, Intel, Apple]
+        
+        The affiliations of this paper are as follows: __AFFILIATIONS__"""
+        prompt = prompt.replace('__AFFILIATIONS__', str(self.affiliations))
+
+        # use gpt-4o tokenizer for estimation
+        enc = tiktoken.encoding_for_model("gpt-4o")
+        prompt_tokens = enc.encode(prompt)
+        prompt_tokens = prompt_tokens[:4000]  # truncate to 4000 tokens
+        prompt = enc.decode(prompt_tokens)
+        llm = get_llm()
+        score = llm.generate(
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are an assistant who perfectly generates a score for the paper based on the affiliations of the authors. If the affiliations are not found, you should return 1. The score should be a number between 0 and 5, with 0.5 as the minimum step. Only retuen the score, do not return any intermediate results.",
+                },
+                {"role": "user", "content": prompt},
+            ]
+        )
+        if score is None:
+            return 1
+        return literal_eval(score)
