@@ -182,7 +182,7 @@ class ArxivPaper:
         __INTRODUCTION__
         __CONCLUSION__
 
-        Response a python dict with 'tldr' and 'topic' as keys, format like "{'tldr': '...', 'topic': '...'}". Make sure your response could be directly parserd by python eval function. Do not return any intermediate results.
+        Response a python dict with 'tldr' and 'topic' as keys, i.e., "{'tldr': '...', 'topic': '...'}". Make sure your response could be directly parserd by python eval function. Do not return any intermediate results.
         """
         prompt = prompt.replace('__TITLE__', self.title)
         prompt = prompt.replace('__ABSTRACT__', self.summary)
