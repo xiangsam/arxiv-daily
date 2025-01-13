@@ -200,7 +200,7 @@ class ArxivPaper:
             messages=[
                 {
                     "role": "system",
-                    "content": "You are an assistant who perfectly summarizes scientific paper, and gives the core idea of the paper to the user.",
+                    "content": "You are an assistant who perfectly summarizes scientific paper, and gives the core idea of the paper to the user. Make sure your response could be directly parserd by python eval function.",
                 },
                 {"role": "user", "content": prompt},
             ]
