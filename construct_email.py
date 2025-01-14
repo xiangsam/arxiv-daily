@@ -147,7 +147,7 @@ def render_email(papers:list[ArxivPaper]):
         parts.append(get_block_html(title = p.title, authors = authors, 
                                     rate = rate, arxiv_id = p.arxiv_id,
                                     tldr = p.tldr, abstract = p.summary,
-                                    topic = p.topic, pfd_url = p.pdf_url, 
+                                    topic = p.topic, pdf_url = p.pdf_url, 
                                     code_url = p.code_url, affiliations = affiliations))
 
     content = '<br>' + '</br><br>'.join(parts) + '</br>'
