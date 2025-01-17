@@ -31,6 +31,14 @@ framework = """
     .full-star {
       vertical-align: middle;
     }
+    /* 添加心形按钮样式 */
+    .heart-btn {
+      filter: grayscale(1); /* 默认灰色 */
+      cursor: pointer;
+    }
+    .heart-btn.active {
+      filter: none; /* 恢复原色 */
+    }
   </style>
 </head>
 <body>
@@ -43,6 +51,13 @@ framework = """
 <div>
 To unsubscribe, remove your email in your Github Action setting.
 </div>
+
+<script>
+  // JavaScript 用于切换心形按钮的状态
+  function toggleHeart(button) {
+    button.classList.toggle('active');
+  }
+</script>
 
 </body>
 </html>
@@ -115,6 +130,7 @@ def get_block_html(title:str, authors:str, rate:str, arxiv_id:str, abstract:str,
             <a href="{pdf_url}" style="display: inline-block; text-decoration: none; font-size: 14px; font-weight: bold; color: #fff; background-color: #d9534f; padding: 8px 16px; border-radius: 4px;">PDF</a>
             <a href="{kimi}" style="display: inline-block; text-decoration: none; font-size: 14px; font-weight: bold; color: #fff; background-color: #476fae; padding: 8px 16px; border-radius: 4px;">Kimi</a>
             {code}
+            <span class="heart-btn" onclick="toggleHeart(this)">❤️</span>
         </td>
     </tr>
 </table>
