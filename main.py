@@ -115,7 +115,7 @@ if __name__ == '__main__':
         set_global_llm(api_key=args.openai_api_key, base_url=args.openai_api_base, model=args.model_name)
     html = render_email(papers)
     with open('index.html', 'w') as f:
-        f.write(html_content)
+        f.write(html)
     logger.info("Sending email...")
     send_email(args.sender, args.receiver, args.sender_password, args.smtp_server, args.smtp_port, html)
     logger.success("Email sent successfully! If you don't receive the email, please check the configuration and the junk box.")
