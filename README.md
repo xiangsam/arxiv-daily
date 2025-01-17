@@ -11,6 +11,7 @@ This repository is modified from [*Zotero-arXiv-Daily*](https://github.com/TideD
 - Use LLM to tag topics for papers.
 - Score papers based on the gathered affiliations.
 - Allow specifying the used online LLM (need OpenAI-like interface.)
+- Add a Kimi button for reading and summarizing papers (based on the Kimi website).
 
 
 ## 🧐 About <a name = "about"></a>
