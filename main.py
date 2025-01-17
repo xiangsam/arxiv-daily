@@ -114,10 +114,8 @@ if __name__ == '__main__':
         logger.info("Using OpenAI API as global LLM.")
         set_global_llm(api_key=args.openai_api_key, base_url=args.openai_api_base, model=args.model_name)
     html = render_email(papers)
-    if args.debug:
-        with open('email.html','w') as f:
-            f.write(html)
-        logger.debug("Debug mode is on. The email content is saved to email.html.")
+    with open('index.html', 'w') as f:
+        f.write(html_content)
     logger.info("Sending email...")
     send_email(args.sender, args.receiver, args.sender_password, args.smtp_server, args.smtp_port, html)
     logger.success("Email sent successfully! If you don't receive the email, please check the configuration and the junk box.")
