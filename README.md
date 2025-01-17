@@ -12,6 +12,7 @@ This repository is modified from [*Zotero-arXiv-Daily*](https://github.com/TideD
 - Score papers based on the gathered affiliations.
 - Allow specifying the used online LLM (need OpenAI-like interface.)
 - Add a Kimi button for reading and summarizing papers (based on the Kimi website).
+- Add a Like button for marking papers you are interested in.
 
 
 ## 🧐 About <a name = "about"></a>
