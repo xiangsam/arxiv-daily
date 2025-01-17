@@ -1,0 +1,243 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+  <style>
+    .star-wrapper {
+      font-size: 1.3em; /* 调整星星大小 */
+      line-height: 1; /* 确保垂直对齐 */
+      display: inline-flex;
+      align-items: center; /* 保持对齐 */
+    }
+    .half-star {
+      display: inline-block;
+      width: 0.5em; /* 半颗星的宽度 */
+      overflow: hidden;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+    .full-star {
+      vertical-align: middle;
+    }
+    /* 添加心形按钮样式 */
+    .heart-btn {
+      filter: grayscale(1); /* 默认灰色 */
+      cursor: pointer;
+    }
+    .heart-btn.active {
+      filter: none; /* 恢复原色 */
+    }
+  </style>
+</head>
+<body>
+
+<div>
+    <br>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; border: 1px solid #ddd; border-radius: 8px; padding: 16px; background-color: #f9f9f9;">
+    <tr>
+        <td style="font-size: 20px; font-weight: bold; color: #333;">
+            Learnings from Scaling Visual Tokenizers for Reconstruction and Generation
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size: 14px; color: #666; padding: 8px 0;">
+            Philippe Hansen-Estruch, David Yan, Ching-Yao Chung, Orr Zohar, Jialiang Wang, ...
+            <br>
+            <i>UT Austin, FAIR, Meta, Stanford University, GenAI, Meta</i>
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size: 14px; color: #333; padding: 8px 0;">
+            <strong>Tag:</strong> Transformer-based architectures for visual tokenization
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size: 14px; color: #333; padding: 8px 0;">
+            <strong>Score:</strong> <div class="star-wrapper"><span class="full-star">⭐</span><span class="full-star">⭐</span><span class="full-star">⭐</span><span class="full-star">⭐</span><span class="half-star">⭐</span></div>
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size: 14px; color: #333; padding: 8px 0;">
+            <strong>arXiv ID:</strong> 2501.09755
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size: 14px; color: #333; padding: 8px 0;">
+            <strong>Abstract:</strong> Visual tokenization via auto-encoding empowers state-of-the-art image and
+video generative models by compressing pixels into a latent space. Although
+scaling Transformer-based generators has been central to recent advances, the
+tokenizer component itself is rarely scaled, leaving open questions about how
+auto-encoder design choices influence both its objective of reconstruction and
+downstream generative performance. Our work aims to conduct an exploration of
+scaling in auto-encoders to fill in this blank. To facilitate this exploration,
+we replace the typical convolutional backbone with an enhanced Vision
+Transformer architecture for Tokenization (ViTok). We train ViTok on
+large-scale image and video datasets far exceeding ImageNet-1K, removing data
+constraints on tokenizer scaling. We first study how scaling the auto-encoder
+bottleneck affects both reconstruction and generation -- and find that while it
+is highly correlated with reconstruction, its relationship with generation is
+more complex. We next explored the effect of separately scaling the
+auto-encoders' encoder and decoder on reconstruction and generation
+performance. Crucially, we find that scaling the encoder yields minimal gains
+for either reconstruction or generation, while scaling the decoder boosts
+reconstruction but the benefits for generation are mixed. Building on our
+exploration, we design ViTok as a lightweight auto-encoder that achieves
+competitive performance with state-of-the-art auto-encoders on ImageNet-1K and
+COCO reconstruction tasks (256p and 512p) while outperforming existing
+auto-encoders on 16-frame 128p video reconstruction for UCF-101, all with 2-5x
+fewer FLOPs. When integrated with Diffusion Transformers, ViTok demonstrates
+competitive performance on image generation for ImageNet-1K and sets new
+state-of-the-art benchmarks for class-conditional video generation on UCF-101.
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size: 14px; color: #333; padding: 8px 0;">
+            <strong>TLDR:</strong> The paper explores the scaling of auto-encoders for visual tokenization, introducing ViTok, a Vision Transformer-based auto-encoder, and finds that while scaling the bottleneck improves reconstruction, it negatively impacts generation, with encoder scaling offering minimal gains and decoder scaling providing mixed results, ultimately achieving competitive performance in image and video generation tasks with fewer FLOPs.
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding: 8px 0;">
+            <a href="http://arxiv.org/pdf/2501.09755v1" style="display: inline-block; text-decoration: none; font-size: 14px; font-weight: bold; color: #fff; background-color: #d9534f; padding: 8px 16px; border-radius: 4px;">PDF</a>
+            <a href="https://kimi.moonshot.cn/_prefill_chat?prefill_prompt=%E8%AF%B7%E4%BD%A0%E9%98%85%E8%AF%BBLearnings+from+Scaling+Visual+Tokenizers+for+Reconstruction+and+Generation%E8%BF%99%E7%AF%87%E8%AE%BA%E6%96%87%EF%BC%8C%E9%93%BE%E6%8E%A5%E6%98%AF+http://arxiv.org/pdf/2501.09755v1+%EF%BC%8C%E5%B9%B6%E5%9B%9E%E7%AD%94%E4%BB%A5%E4%B8%8B%E9%97%AE%E9%A2%98%EF%BC%9A%0A%2A%2AQ1.+%E8%BF%99%E7%AF%87%E8%AE%BA%E6%96%87%E8%AF%95%E5%9B%BE%E8%A7%A3%E5%86%B3%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98%EF%BC%9F%2A%2A%0A%2A%2AQ2.+%E8%BF%99%E6%98%AF%E4%B8%80%E4%B8%AA%E6%96%B0%E9%97%AE%E9%A2%98%E5%90%97%EF%BC%9F%E5%A6%82%E6%9E%9C%E6%9C%89%E7%9B%B8%E5%85%B3%E7%A0%94%E7%A9%B6%EF%BC%8C%E8%AF%B7%E7%BB%99%E5%87%BA%E5%B9%B6%E6%80%BB%E7%BB%93%E6%96%B9%E6%B3%95%2A%2A%0A%2A%2AQ3.+%E6%9C%AC%E6%96%87%E8%AF%95%E5%9B%BE%E9%AA%8C%E8%AF%81%E7%9A%84%E7%A7%91%E5%AD%A6%E5%81%87%E8%AE%BE%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F%2A%2A%0A%2A%2AQ4.+%E8%BF%99%E7%AF%87%E8%AE%BA%E6%96%87%E6%8F%90%E5%87%BA%E4%BA%86%E4%BB%80%E4%B9%88%E6%96%B0%E7%9A%84%E6%83%B3%E6%B3%95%E3%80%81%E6%96%B9%E6%B3%95%E6%88%96%E6%A8%A1%E5%9E%8B%EF%BC%9F%E4%B8%8E%E4%BB%A5%E5%89%8D%E7%9A%84%E6%96%B9%E6%B3%95%E7%9B%B8%E6%AF%94%EF%BC%8C%E6%9C%89%E4%BB%80%E4%B9%88%E7%89%B9%E7%82%B9%E5%92%8C%E4%BC%98%E5%8A%BF%EF%BC%9F%2A%2A%0A%2A%2AQ5.+%E8%AE%BA%E6%96%87%E4%B8%AD%E7%9A%84%E5%AE%9E%E9%AA%8C%E6%98%AF%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1%E7%9A%84%EF%BC%9F%2A%2A%0A%2A%2AQ6.+%E5%AE%9E%E9%AA%8C%E5%92%8C%E7%BB%93%E6%9E%9C%E6%98%AF%E5%90%A6%E5%BE%88%E5%A5%BD%E5%9C%B0%E6%94%AF%E6%8C%81%E4%BA%86%E9%9C%80%E8%A6%81%E9%AA%8C%E8%AF%81%E7%9A%84%E7%A7%91%E5%AD%A6%E5%81%87%E8%AE%BE%2A%2A%0A%E5%9B%9E%E7%AD%94%E6%97%B6%E8%AF%B7%E5%85%88%E9%87%8D%E5%A4%8D%E9%97%AE%E9%A2%98%EF%BC%8C%E5%86%8D%E8%BF%9B%E8%A1%8C%E5%AF%B9%E5%BA%94%E7%9A%84%E5%9B%9E%E7%AD%94%E3%80%82&system_prompt=%E4%BD%A0%E6%98%AF%E4%B8%80%E4%B8%AA%E5%AD%A6%E6%9C%AF%E4%B8%93%E5%AE%B6%EF%BC%8C%E8%AF%B7%E4%BD%A0%E4%BB%94%E7%BB%86%E9%98%85%E8%AF%BB%E5%90%8E%E7%BB%AD%E9%93%BE%E6%8E%A5%E4%B8%AD%E7%9A%84%E8%AE%BA%E6%96%87%EF%BC%8C%E5%B9%B6%E5%AF%B9%E7%94%A8%E6%88%B7%E7%9A%84%E9%97%AE%E9%A2%98%E8%BF%9B%E8%A1%8C%E4%B8%93%E4%B8%9A%E7%9A%84%E5%9B%9E%E7%AD%94%EF%BC%8C%E4%B8%8D%E8%A6%81%E5%87%BA%E7%8E%B0%E7%AC%AC%E4%B8%80%E4%BA%BA%E7%A7%B0%EF%BC%8C%E5%BD%93%E6%B6%89%E5%8F%8A%E5%88%B0%E5%88%86%E7%82%B9%E5%9B%9E%E7%AD%94%E6%97%B6%EF%BC%8C%E9%BC%93%E5%8A%B1%E4%BD%A0%E4%BB%A5markdown%E6%A0%BC%E5%BC%8F%E8%BE%93%E5%87%BA%E3%80%82%E5%AF%B9%E4%BA%8E%E5%BC%95%E7%94%A8%E7%9A%84%E5%86%85%E5%AE%B9%EF%BC%8C%E4%BD%A0%E9%9C%80%E8%A6%81%E5%8F%8A%E6%97%B6%E5%9C%A8%E5%BC%95%E7%94%A8%E5%86%85%E5%AE%B9%E5%90%8E%E7%BB%99%E5%87%BA%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5%E3%80%82&send_immediately=true&force_search=true" style="display: inline-block; text-decoration: none; font-size: 14px; font-weight: bold; color: #fff; background-color: #476fae; padding: 8px 16px; border-radius: 4px;">Kimi</a>
+            
+            <span class="heart-btn" onclick="toggleHeart(this)">❤️</span>
+        </td>
+    </tr>
+</table>
+</br><br>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; border: 1px solid #ddd; border-radius: 8px; padding: 16px; background-color: #f9f9f9;">
+    <tr>
+        <td style="font-size: 20px; font-weight: bold; color: #333;">
+            KU AIGEN ICL EDI@BC8 Track 3: Advancing Phenotype Named Entity Recognition and Normalization for Dysmorphology Physical Examination Reports
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size: 14px; color: #666; padding: 8px 0;">
+            Hajung Kim, Chanhwi Kim, Jiwoong Sohn, Tim Beck, Marek Rei, ...
+            <br>
+            <i>Korea University, University of Edinburgh, University of Nottingham, Imperial College London, AIGEN Sciences</i>
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size: 14px; color: #333; padding: 8px 0;">
+            <strong>Tag:</strong> Named Entity Recognition in Biomedical Texts
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size: 14px; color: #333; padding: 8px 0;">
+            <strong>Score:</strong> <div class="star-wrapper"><span class="full-star">⭐</span></div>
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size: 14px; color: #333; padding: 8px 0;">
+            <strong>arXiv ID:</strong> 2501.09744
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size: 14px; color: #333; padding: 8px 0;">
+            <strong>Abstract:</strong> The objective of BioCreative8 Track 3 is to extract phenotypic key medical
+findings embedded within EHR texts and subsequently normalize these findings to
+their Human Phenotype Ontology (HPO) terms. However, the presence of diverse
+surface forms in phenotypic findings makes it challenging to accurately
+normalize them to the correct HPO terms. To address this challenge, we explored
+various models for named entity recognition and implemented data augmentation
+techniques such as synonym marginalization to enhance the normalization step.
+Our pipeline resulted in an exact extraction and normalization F1 score 2.6\%
+higher than the mean score of all submissions received in response to the
+challenge. Furthermore, in terms of the normalization F1 score, our approach
+surpassed the average performance by 1.9\%. These findings contribute to the
+advancement of automated medical data extraction and normalization techniques,
+showcasing potential pathways for future research and application in the
+biomedical domain.
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size: 14px; color: #333; padding: 8px 0;">
+            <strong>TLDR:</strong> The paper presents a pipeline for phenotype named entity recognition and normalization in dysmorphology physical examination reports, achieving higher F1 scores than the average submissions in BioCreative8 Track 3 by using data augmentation techniques and exploring various models.
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding: 8px 0;">
+            <a href="http://arxiv.org/pdf/2501.09744v1" style="display: inline-block; text-decoration: none; font-size: 14px; font-weight: bold; color: #fff; background-color: #d9534f; padding: 8px 16px; border-radius: 4px;">PDF</a>
+            <a href="https://kimi.moonshot.cn/_prefill_chat?prefill_prompt=%E8%AF%B7%E4%BD%A0%E9%98%85%E8%AF%BBKU+AIGEN+ICL+EDI%40BC8+Track+3:+Advancing+Phenotype+Named+Entity+Recognition+and+Normalization+for+Dysmorphology+Physical+Examination+Reports%E8%BF%99%E7%AF%87%E8%AE%BA%E6%96%87%EF%BC%8C%E9%93%BE%E6%8E%A5%E6%98%AF+http://arxiv.org/pdf/2501.09744v1+%EF%BC%8C%E5%B9%B6%E5%9B%9E%E7%AD%94%E4%BB%A5%E4%B8%8B%E9%97%AE%E9%A2%98%EF%BC%9A%0A%2A%2AQ1.+%E8%BF%99%E7%AF%87%E8%AE%BA%E6%96%87%E8%AF%95%E5%9B%BE%E8%A7%A3%E5%86%B3%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98%EF%BC%9F%2A%2A%0A%2A%2AQ2.+%E8%BF%99%E6%98%AF%E4%B8%80%E4%B8%AA%E6%96%B0%E9%97%AE%E9%A2%98%E5%90%97%EF%BC%9F%E5%A6%82%E6%9E%9C%E6%9C%89%E7%9B%B8%E5%85%B3%E7%A0%94%E7%A9%B6%EF%BC%8C%E8%AF%B7%E7%BB%99%E5%87%BA%E5%B9%B6%E6%80%BB%E7%BB%93%E6%96%B9%E6%B3%95%2A%2A%0A%2A%2AQ3.+%E6%9C%AC%E6%96%87%E8%AF%95%E5%9B%BE%E9%AA%8C%E8%AF%81%E7%9A%84%E7%A7%91%E5%AD%A6%E5%81%87%E8%AE%BE%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F%2A%2A%0A%2A%2AQ4.+%E8%BF%99%E7%AF%87%E8%AE%BA%E6%96%87%E6%8F%90%E5%87%BA%E4%BA%86%E4%BB%80%E4%B9%88%E6%96%B0%E7%9A%84%E6%83%B3%E6%B3%95%E3%80%81%E6%96%B9%E6%B3%95%E6%88%96%E6%A8%A1%E5%9E%8B%EF%BC%9F%E4%B8%8E%E4%BB%A5%E5%89%8D%E7%9A%84%E6%96%B9%E6%B3%95%E7%9B%B8%E6%AF%94%EF%BC%8C%E6%9C%89%E4%BB%80%E4%B9%88%E7%89%B9%E7%82%B9%E5%92%8C%E4%BC%98%E5%8A%BF%EF%BC%9F%2A%2A%0A%2A%2AQ5.+%E8%AE%BA%E6%96%87%E4%B8%AD%E7%9A%84%E5%AE%9E%E9%AA%8C%E6%98%AF%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1%E7%9A%84%EF%BC%9F%2A%2A%0A%2A%2AQ6.+%E5%AE%9E%E9%AA%8C%E5%92%8C%E7%BB%93%E6%9E%9C%E6%98%AF%E5%90%A6%E5%BE%88%E5%A5%BD%E5%9C%B0%E6%94%AF%E6%8C%81%E4%BA%86%E9%9C%80%E8%A6%81%E9%AA%8C%E8%AF%81%E7%9A%84%E7%A7%91%E5%AD%A6%E5%81%87%E8%AE%BE%2A%2A%0A%E5%9B%9E%E7%AD%94%E6%97%B6%E8%AF%B7%E5%85%88%E9%87%8D%E5%A4%8D%E9%97%AE%E9%A2%98%EF%BC%8C%E5%86%8D%E8%BF%9B%E8%A1%8C%E5%AF%B9%E5%BA%94%E7%9A%84%E5%9B%9E%E7%AD%94%E3%80%82&system_prompt=%E4%BD%A0%E6%98%AF%E4%B8%80%E4%B8%AA%E5%AD%A6%E6%9C%AF%E4%B8%93%E5%AE%B6%EF%BC%8C%E8%AF%B7%E4%BD%A0%E4%BB%94%E7%BB%86%E9%98%85%E8%AF%BB%E5%90%8E%E7%BB%AD%E9%93%BE%E6%8E%A5%E4%B8%AD%E7%9A%84%E8%AE%BA%E6%96%87%EF%BC%8C%E5%B9%B6%E5%AF%B9%E7%94%A8%E6%88%B7%E7%9A%84%E9%97%AE%E9%A2%98%E8%BF%9B%E8%A1%8C%E4%B8%93%E4%B8%9A%E7%9A%84%E5%9B%9E%E7%AD%94%EF%BC%8C%E4%B8%8D%E8%A6%81%E5%87%BA%E7%8E%B0%E7%AC%AC%E4%B8%80%E4%BA%BA%E7%A7%B0%EF%BC%8C%E5%BD%93%E6%B6%89%E5%8F%8A%E5%88%B0%E5%88%86%E7%82%B9%E5%9B%9E%E7%AD%94%E6%97%B6%EF%BC%8C%E9%BC%93%E5%8A%B1%E4%BD%A0%E4%BB%A5markdown%E6%A0%BC%E5%BC%8F%E8%BE%93%E5%87%BA%E3%80%82%E5%AF%B9%E4%BA%8E%E5%BC%95%E7%94%A8%E7%9A%84%E5%86%85%E5%AE%B9%EF%BC%8C%E4%BD%A0%E9%9C%80%E8%A6%81%E5%8F%8A%E6%97%B6%E5%9C%A8%E5%BC%95%E7%94%A8%E5%86%85%E5%AE%B9%E5%90%8E%E7%BB%99%E5%87%BA%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5%E3%80%82&send_immediately=true&force_search=true" style="display: inline-block; text-decoration: none; font-size: 14px; font-weight: bold; color: #fff; background-color: #476fae; padding: 8px 16px; border-radius: 4px;">Kimi</a>
+            
+            <span class="heart-btn" onclick="toggleHeart(this)">❤️</span>
+        </td>
+    </tr>
+</table>
+</br><br>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; border: 1px solid #ddd; border-radius: 8px; padding: 16px; background-color: #f9f9f9;">
+    <tr>
+        <td style="font-size: 20px; font-weight: bold; color: #333;">
+            Parallel multi-objective metaheuristics for smart communications in vehicular networks
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size: 14px; color: #666; padding: 8px 0;">
+            Jamal Toutouh, Enrique Alba
+            <br>
+            <i>Unknown Affiliation</i>
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size: 14px; color: #333; padding: 8px 0;">
+            <strong>Tag:</strong> Optimization of routing protocols in vehicular networks using metaheuristics
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size: 14px; color: #333; padding: 8px 0;">
+            <strong>Score:</strong> <div class="star-wrapper"><span class="full-star">⭐</span></div>
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size: 14px; color: #333; padding: 8px 0;">
+            <strong>arXiv ID:</strong> 2501.09725
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size: 14px; color: #333; padding: 8px 0;">
+            <strong>Abstract:</strong> This article analyzes the use of two parallel multi-objective soft computing
+algorithms to automatically search for high-quality settings of the Ad hoc On
+Demand Vector routing protocol for vehicular networks. These methods are based
+on an evolutionary algorithm and on a swarm intelligence approach. The
+experimental analysis demonstrates that the configurations computed by our
+optimization algorithms outperform other state-of-the-art optimized ones. In
+turn, the computational efficiency achieved by all the parallel versions is
+greater than 87 %. Therefore, the line of work presented in this article
+represents an efficient framework to improve vehicular communications.
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size: 14px; color: #333; padding: 8px 0;">
+            <strong>TLDR:</strong> The paper presents parallel multi-objective metaheuristics, including evolutionary and swarm intelligence algorithms, to optimize Ad hoc On Demand Vector routing protocol settings in vehicular networks, achieving over 87% computational efficiency and outperforming state-of-the-art configurations.
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding: 8px 0;">
+            <a href="http://arxiv.org/pdf/2501.09725v1" style="display: inline-block; text-decoration: none; font-size: 14px; font-weight: bold; color: #fff; background-color: #d9534f; padding: 8px 16px; border-radius: 4px;">PDF</a>
+            <a href="https://kimi.moonshot.cn/_prefill_chat?prefill_prompt=%E8%AF%B7%E4%BD%A0%E9%98%85%E8%AF%BBParallel+multi-objective+metaheuristics+for+smart+communications+in+vehicular+networks%E8%BF%99%E7%AF%87%E8%AE%BA%E6%96%87%EF%BC%8C%E9%93%BE%E6%8E%A5%E6%98%AF+http://arxiv.org/pdf/2501.09725v1+%EF%BC%8C%E5%B9%B6%E5%9B%9E%E7%AD%94%E4%BB%A5%E4%B8%8B%E9%97%AE%E9%A2%98%EF%BC%9A%0A%2A%2AQ1.+%E8%BF%99%E7%AF%87%E8%AE%BA%E6%96%87%E8%AF%95%E5%9B%BE%E8%A7%A3%E5%86%B3%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98%EF%BC%9F%2A%2A%0A%2A%2AQ2.+%E8%BF%99%E6%98%AF%E4%B8%80%E4%B8%AA%E6%96%B0%E9%97%AE%E9%A2%98%E5%90%97%EF%BC%9F%E5%A6%82%E6%9E%9C%E6%9C%89%E7%9B%B8%E5%85%B3%E7%A0%94%E7%A9%B6%EF%BC%8C%E8%AF%B7%E7%BB%99%E5%87%BA%E5%B9%B6%E6%80%BB%E7%BB%93%E6%96%B9%E6%B3%95%2A%2A%0A%2A%2AQ3.+%E6%9C%AC%E6%96%87%E8%AF%95%E5%9B%BE%E9%AA%8C%E8%AF%81%E7%9A%84%E7%A7%91%E5%AD%A6%E5%81%87%E8%AE%BE%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F%2A%2A%0A%2A%2AQ4.+%E8%BF%99%E7%AF%87%E8%AE%BA%E6%96%87%E6%8F%90%E5%87%BA%E4%BA%86%E4%BB%80%E4%B9%88%E6%96%B0%E7%9A%84%E6%83%B3%E6%B3%95%E3%80%81%E6%96%B9%E6%B3%95%E6%88%96%E6%A8%A1%E5%9E%8B%EF%BC%9F%E4%B8%8E%E4%BB%A5%E5%89%8D%E7%9A%84%E6%96%B9%E6%B3%95%E7%9B%B8%E6%AF%94%EF%BC%8C%E6%9C%89%E4%BB%80%E4%B9%88%E7%89%B9%E7%82%B9%E5%92%8C%E4%BC%98%E5%8A%BF%EF%BC%9F%2A%2A%0A%2A%2AQ5.+%E8%AE%BA%E6%96%87%E4%B8%AD%E7%9A%84%E5%AE%9E%E9%AA%8C%E6%98%AF%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1%E7%9A%84%EF%BC%9F%2A%2A%0A%2A%2AQ6.+%E5%AE%9E%E9%AA%8C%E5%92%8C%E7%BB%93%E6%9E%9C%E6%98%AF%E5%90%A6%E5%BE%88%E5%A5%BD%E5%9C%B0%E6%94%AF%E6%8C%81%E4%BA%86%E9%9C%80%E8%A6%81%E9%AA%8C%E8%AF%81%E7%9A%84%E7%A7%91%E5%AD%A6%E5%81%87%E8%AE%BE%2A%2A%0A%E5%9B%9E%E7%AD%94%E6%97%B6%E8%AF%B7%E5%85%88%E9%87%8D%E5%A4%8D%E9%97%AE%E9%A2%98%EF%BC%8C%E5%86%8D%E8%BF%9B%E8%A1%8C%E5%AF%B9%E5%BA%94%E7%9A%84%E5%9B%9E%E7%AD%94%E3%80%82&system_prompt=%E4%BD%A0%E6%98%AF%E4%B8%80%E4%B8%AA%E5%AD%A6%E6%9C%AF%E4%B8%93%E5%AE%B6%EF%BC%8C%E8%AF%B7%E4%BD%A0%E4%BB%94%E7%BB%86%E9%98%85%E8%AF%BB%E5%90%8E%E7%BB%AD%E9%93%BE%E6%8E%A5%E4%B8%AD%E7%9A%84%E8%AE%BA%E6%96%87%EF%BC%8C%E5%B9%B6%E5%AF%B9%E7%94%A8%E6%88%B7%E7%9A%84%E9%97%AE%E9%A2%98%E8%BF%9B%E8%A1%8C%E4%B8%93%E4%B8%9A%E7%9A%84%E5%9B%9E%E7%AD%94%EF%BC%8C%E4%B8%8D%E8%A6%81%E5%87%BA%E7%8E%B0%E7%AC%AC%E4%B8%80%E4%BA%BA%E7%A7%B0%EF%BC%8C%E5%BD%93%E6%B6%89%E5%8F%8A%E5%88%B0%E5%88%86%E7%82%B9%E5%9B%9E%E7%AD%94%E6%97%B6%EF%BC%8C%E9%BC%93%E5%8A%B1%E4%BD%A0%E4%BB%A5markdown%E6%A0%BC%E5%BC%8F%E8%BE%93%E5%87%BA%E3%80%82%E5%AF%B9%E4%BA%8E%E5%BC%95%E7%94%A8%E7%9A%84%E5%86%85%E5%AE%B9%EF%BC%8C%E4%BD%A0%E9%9C%80%E8%A6%81%E5%8F%8A%E6%97%B6%E5%9C%A8%E5%BC%95%E7%94%A8%E5%86%85%E5%AE%B9%E5%90%8E%E7%BB%99%E5%87%BA%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5%E3%80%82&send_immediately=true&force_search=true" style="display: inline-block; text-decoration: none; font-size: 14px; font-weight: bold; color: #fff; background-color: #476fae; padding: 8px 16px; border-radius: 4px;">Kimi</a>
+            
+            <span class="heart-btn" onclick="toggleHeart(this)">❤️</span>
+        </td>
+    </tr>
+</table>
+</br>
+</div>
+
+<br><br>
+<div>
+To unsubscribe, remove your email in your Github Action setting.
+</div>
+
+<script>
+  // JavaScript 用于切换心形按钮的状态
+  function toggleHeart(button) {
+    button.classList.toggle('active');
+  }
+</script>
+
+</body>
+</html>
