@@ -332,10 +332,28 @@ framework = """
 <script>
   // 检测是否在邮件客户端中查看
   function isInEmailClient() {
-    return window.location.href.startsWith('cid:') || 
-           window.location.href.startsWith('data:') || 
-           window.navigator.userAgent.includes('Outlook') || 
-           window.navigator.userAgent.includes('Thunderbird');
+    const url = window.location.href;
+    const userAgent = window.navigator.userAgent;
+
+    // URL 检测
+    if (url.startsWith('cid:') || url.startsWith('data:')) {
+      return true;
+    }
+
+    // User Agent 检测
+    const emailClients = [
+      'Outlook', // Microsoft Outlook
+      'Thunderbird', // Mozilla Thunderbird
+      'AppleMail', // Apple Mail
+      'Mail', // Generic mail clients
+      'SamsungEmail', // Samsung Email
+    ];
+    for (const client of emailClients) {
+      if (userAgent.includes(client)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   // 显示提示条
