@@ -270,8 +270,6 @@ framework = """
       text-align: center;
       z-index: 1000;
       display: none;
-    }
-    .browser-prompt.visible {
       display: block;
     }
     .browser-prompt a {
