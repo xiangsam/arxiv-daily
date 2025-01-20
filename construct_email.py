@@ -282,19 +282,6 @@ framework = """
     .browser-prompt a:hover {
       color: #f1c40f;
     }
-    /* 添加CSS特性检测 */
-    @media (prefers-reduced-motion: no-preference) {
-      body:after {
-        content: 'browser';
-        display: none;
-      }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      body:after {
-        content: 'email-client';
-        display: none;
-      }
-    }
   </style>
 </head>
 <body>
@@ -343,39 +330,17 @@ framework = """
 <a href="#" class="back-to-top">↑</a>
 
 <script>
-  // 检测是否在邮件客户端中查看
-  function isInEmailClient() {
-    const url = window.location.href;
-    const userAgent = window.navigator.userAgent;
-
-    // URL 检测
-    if (url.startsWith('cid:') || url.startsWith('data:')) {
-      return true;
-    }
-
-    // User Agent 检测
-    const emailClients = [
-      'Outlook', // Microsoft Outlook
-      'Thunderbird', // Mozilla Thunderbird
-      'AppleMail', // Apple Mail
-      'Mail', // Generic mail clients
-      'SamsungEmail', // Samsung Email
-    ];
-    for (const client of emailClients) {
-      if (userAgent.includes(client)) {
-        return true;
-      }
-    }
-    // 使用CSS特性检测
-    const detectionElement = window.getComputedStyle(document.body, ':after').content;
-    if (detectionElement && detectionElement.includes('email-client')) {
+  // 检测是否在浏览器中查看
+  function isNormalBrowserLoad() {
+    // 检查是否可以执行JavaScript
+    if (typeof window!== 'undefined' && 'location' in window) {
       return true;
     }
     return false;
   }
 
   // 显示提示条
-  if (isInEmailClient()) {
+  if (!isNormalBrowserLoad()) {
     const prompt = document.getElementById('browser-prompt');
     prompt.classList.add('visible');
   }
