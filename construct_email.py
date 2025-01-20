@@ -15,6 +15,7 @@ framework = """
 <html>
 <head>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <style>
     body {
       font-family: 'Roboto', sans-serif;
@@ -433,7 +434,7 @@ def get_block_html(title:str, authors:str, rate:str, arxiv_id:str, abstract:str,
 **Q6. 实验和结果是否很好地支持了需要验证的科学假设**
 回答时请先重复问题，再进行对应的回答。&system_prompt=你是一个学术专家，请你仔细阅读后续链接中的论文，并对用户的问题进行专业的回答，不要出现第一人称，当涉及到分点回答时，鼓励你以markdown格式输出。对于引用的内容，你需要及时在引用内容后给出参考链接。&send_immediately=true&force_search=true'''
     ai_url = quote_plus(ai_url, safe='/:?=&')
-    code = f'<a href="{code_url}" class="paper-actions">Code</a>' if code_url else ''
+    code = f"""<a href="#" onclick="openModal('{code_url}')" class="paper-actions">Code</a>""" if code_url else ''
     block_template = """
     <div class="paper-block">
         <div class="paper-title">{title}</div>
@@ -444,7 +445,7 @@ def get_block_html(title:str, authors:str, rate:str, arxiv_id:str, abstract:str,
         <div class="paper-abstract"><strong>Abstract:</strong> {abstract}</div>
         <div class="paper-tldr"><strong>TLDR:</strong> {tldr}</div>
         <div class="paper-actions">
-            <a href="#" onclick="openModal('{kimi}')">Kimi</a>
+            <a href="#" onclick="openModal('{pdf_url}')">PDF</a>
             <a href="#" onclick="openModal('{kimi}')">Kimi</a>
             {code}
             <span class="heart-btn" onclick="toggleHeart(this)">❤️</span>
