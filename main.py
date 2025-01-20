@@ -9,6 +9,7 @@ from loguru import logger
 from paper import ArxivPaper
 from llm import set_global_llm
 import feedparser
+import shutil
 
 load_dotenv(override=True)
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -107,6 +108,7 @@ if __name__ == '__main__':
     if len(papers) == 0:
         logger.info("No new papers found. Yesterday maybe a holiday and no one submit their work :). If this is not the case, please check the ARXIV_QUERY.")
         if not args.send_empty:
+          shutil.copyfile('./assets/enjoy.html', 'index.html')
           exit(0)
     else:
         if args.max_paper_num != -1:
