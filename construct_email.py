@@ -197,9 +197,99 @@ framework = """
       opacity: 1;
       visibility: visible;
     }
+    /* 模态框样式 */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal.visible {
+      display: flex;
+    }
+    .modal-content {
+      background-color: #fff;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 800px;
+      height: 80%;
+      overflow: hidden;
+      position: relative;
+    }
+    .modal-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .modal-actions {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      gap: 8px;
+    }
+    .modal-button {
+      background-color: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease;
+    }
+    .modal-button:hover {
+      background-color: #2980b9;
+    }
+    .modal-button.close {
+      background-color: #e74c3c;
+    }
+    .modal-button.close:hover {
+      background-color: #c0392b;
+    }
+    /* 提示条样式 */
+    .browser-prompt {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #3498db;
+      color: #fff;
+      padding: 12px;
+      text-align: center;
+      z-index: 1000;
+      display: none;
+    }
+    .browser-prompt.visible {
+      display: block;
+    }
+    .browser-prompt a {
+      color: #fff;
+      text-decoration: underline;
+      margin-left: 8px;
+    }
+    .browser-prompt a:hover {
+      color: #f1c40f;
+    }
   </style>
 </head>
 <body>
+
+<!-- 提示条 -->
+<div class="browser-prompt" id="browser-prompt">
+  For the best experience, please open this page in your browser.
+  <a href="#" onclick="openSpecifiedUrl()">Open in Browser</a>
+</div>
 
 <div class="container">
   <div class="header">
@@ -221,9 +311,44 @@ framework = """
 <!-- Toast 提示条 -->
 <div class="toast" id="toast">Added to favorites!</div>
 
+<!-- 模态框 -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <div class="modal-actions">
+      <button class="modal-button" onclick="openInNewTab()" title="Open in new tab">
+        <i class="fas fa-external-link-alt"></i>
+      </button>
+      <button class="modal-button close" onclick="closeModal()" title="Close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <iframe class="modal-iframe" id="modal-iframe" src=""></iframe>
+  </div>
+</div>
+
 <a href="#" class="back-to-top">↑</a>
 
 <script>
+  // 检测是否在邮件客户端中查看
+  function isInEmailClient() {
+    return window.location.href.startsWith('cid:') || 
+           window.location.href.startsWith('data:') || 
+           window.navigator.userAgent.includes('Outlook') || 
+           window.navigator.userAgent.includes('Thunderbird');
+  }
+
+  // 显示提示条
+  if (isInEmailClient()) {
+    const prompt = document.getElementById('browser-prompt');
+    prompt.classList.add('visible');
+  }
+
+  // 打开指定网址
+  function openSpecifiedUrl() {
+    const url = 'https://xiangsam.github.io/arxiv-daily/'; // 指定网址
+    window.open(url, '_blank'); // 在新标签页中打开
+  }
+  
   // 动态加载效果
   document.addEventListener('DOMContentLoaded', function () {
     const paperBlocks = document.querySelectorAll('.paper-block');
@@ -255,6 +380,31 @@ framework = """
     setTimeout(() => {
       toast.classList.remove('visible');
     }, 3000); // 3 秒后消失
+  }
+  
+  // 打开模态框
+  function openModal(url) {
+    const modal = document.getElementById('modal');
+    const iframe = document.getElementById('modal-iframe');
+    iframe.src = url;
+    modal.classList.add('visible');
+  }
+
+  // 关闭模态框
+  function closeModal() {
+    const modal = document.getElementById('modal');
+    const iframe = document.getElementById('modal-iframe');
+    iframe.src = ''; // 清空 iframe 内容
+    modal.classList.remove('visible');
+  }
+
+  // 在新标签页打开
+  function openInNewTab() {
+    const iframe = document.getElementById('modal-iframe');
+    const url = iframe.src;
+    if (url) {
+      window.open(url, '_blank');
+    }
   }
 </script>
 
@@ -294,8 +444,8 @@ def get_block_html(title:str, authors:str, rate:str, arxiv_id:str, abstract:str,
         <div class="paper-abstract"><strong>Abstract:</strong> {abstract}</div>
         <div class="paper-tldr"><strong>TLDR:</strong> {tldr}</div>
         <div class="paper-actions">
-            <a href="{pdf_url}">PDF</a>
-            <a href="{kimi}">Kimi</a>
+            <a href="#" onclick="openModal('{kimi}')">Kimi</a>
+            <a href="#" onclick="openModal('{kimi}')">Kimi</a>
             {code}
             <span class="heart-btn" onclick="toggleHeart(this)">❤️</span>
         </div>
