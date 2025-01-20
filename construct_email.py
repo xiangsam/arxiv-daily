@@ -270,8 +270,6 @@ framework = """
       text-align: center;
       z-index: 1000;
       display: none;
-    }
-    .browser-prompt.visible {
       display: block;
     }
     .browser-prompt a {
@@ -330,7 +328,7 @@ framework = """
 <a href="#" class="back-to-top">↑</a>
 
 <script>
-  // 检测是否在浏览器中查看
+  // 检测是否在浏览器中正常加载
   function isNormalBrowserLoad() {
     // 检查是否可以执行JavaScript
     if (typeof window!== 'undefined' && 'location' in window) {
@@ -339,10 +337,10 @@ framework = """
     return false;
   }
 
-  // 显示提示条
-  if (!isNormalBrowserLoad()) {
+  // 隐藏提示条
+  if (isNormalBrowserLoad()) {
     const prompt = document.getElementById('browser-prompt');
-    prompt.classList.add('visible');
+    prompt.style.display = 'none'; // 隐藏提示条
   }
 
   // 打开指定网址
