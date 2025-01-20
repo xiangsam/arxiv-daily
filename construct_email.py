@@ -287,7 +287,7 @@ framework = """
 <!-- 提示条 -->
 <div class="browser-prompt" id="browser-prompt">
   For the best experience, please open this page in your browser.
-  <a href="#" onclick="openSpecifiedUrl()">Open in Browser</a>
+  <a href="https://xiangsam.github.io/arxiv-daily/">Open in Browser</a>
 </div>
 
 <div class="container">
@@ -302,7 +302,7 @@ framework = """
 
   <div class="footer">
     <p>To unsubscribe, remove your email in your Github Action setting.</p>
-    <p>To have a full reading experience, visit this <a href='https://xiangsam.github.io/arxiv-daily/'>page</a> in a modern brower.</p>
+    <p>To have a full reading experience, <a href='https://xiangsam.github.io/arxiv-daily/'>visit this page</a> in a modern brower.</p>
     <p>&copy; 2023 Research Digest. All rights reserved.</p>
   </div>
 </div>
@@ -341,12 +341,6 @@ framework = """
   if (isNormalBrowserLoad()) {
     const prompt = document.getElementById('browser-prompt');
     prompt.style.display = 'none'; // 隐藏提示条
-  }
-
-  // 打开指定网址
-  function openSpecifiedUrl() {
-    const url = 'https://xiangsam.github.io/arxiv-daily/'; // 指定网址
-    window.open(url, '_blank'); // 在新标签页中打开
   }
   
   // 动态加载效果
