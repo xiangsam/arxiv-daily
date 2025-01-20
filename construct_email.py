@@ -282,6 +282,19 @@ framework = """
     .browser-prompt a:hover {
       color: #f1c40f;
     }
+    /* 添加CSS特性检测 */
+    @media (prefers-reduced-motion: no-preference) {
+      body:after {
+        content: 'browser';
+        display: none;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      body:after {
+        content: 'email-client';
+        display: none;
+      }
+    }
   </style>
 </head>
 <body>
@@ -352,6 +365,11 @@ framework = """
       if (userAgent.includes(client)) {
         return true;
       }
+    }
+    // 使用CSS特性检测
+    const detectionElement = window.getComputedStyle(document.body, ':after').content;
+    if (detectionElement && detectionElement.includes('email-client')) {
+      return true;
     }
     return false;
   }

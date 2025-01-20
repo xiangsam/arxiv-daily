@@ -81,7 +81,7 @@ class ArxivPaper:
     
     @property
     def pdf_url(self):
-        return self._paper.pdf_url
+        return self._paper.pdf_url.replace('http://', 'https://')
     
     
     @cached_property
