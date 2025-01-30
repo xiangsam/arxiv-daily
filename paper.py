@@ -54,7 +54,7 @@ class ArxivPaper:
                     self.tldr = res.get('tldr', None)
                     self.topic = res.get('topic', None)
             except:
-                logger.warn(f'Could not parse {tldr_and_topic} to dict, display it in tldr directly.')
+                logger.warning(f'Could not parse {tldr_and_topic} to dict, display it in tldr directly.')
                 self.tldr = tldr_and_topic
                 self.topic = None
         self.affiliations = self.get_affiliations()
