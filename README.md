@@ -31,7 +31,9 @@ This repository is modified from [*Zotero-arXiv-Daily*](https://github.com/TideD
 - Ignore unwanted Zotero papers using gitignore-style pattern.
 
 ## 📷 Screenshot
-![screenshot](./assets/screenshot.png)
+![screenshot](./assets/arxiv.png)
+
+![screenshot](./assets/rest.png)
 
 ## 🚀 Usage
 ### Quick Start
