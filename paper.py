@@ -180,14 +180,14 @@ class ArxivPaper:
         return file_contents
     
     def get_tldr_and_topic(self) -> Optional[str]:
-        prompt = """Given the title, abstract, introduction and the conclusion (if any) of a paper in latex format, generate a one-sentence TLDR summary. Additionally, propose one relevant search topic related to the paper's category, __CATEGORY__.
+        prompt = """Given the title, abstract, introduction and the conclusion (if any) of a paper in latex format, generate a one-sentence TLDR summary. Additionally, propose one relevant search topic (e.g. LLM Position Embedding) related to the paper's category, __CATEGORY__.
         
         \\title{__TITLE__}
         \\begin{abstract}__ABSTRACT__\\end{abstract}
         __INTRODUCTION__
         __CONCLUSION__
 
-        Response a python dict with 'tldr' and 'topic' as keys, i.e., "{'tldr': '...', 'topic': '...'}". Make sure your response could be directly parserd by python eval function. Only return plaint text. Do not return any intermediate results.
+        Response a python dict with 'tldr' and 'topic' as keys, i.e., "{'tldr': "...", 'topic': "..."}". Make sure your response could be directly parserd by python eval function. Only return plaint text. Do not return any intermediate results.
         """
         prompt = prompt.replace('__TITLE__', self.title)
         prompt = prompt.replace('__ABSTRACT__', self.summary)
