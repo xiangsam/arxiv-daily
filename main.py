@@ -111,10 +111,16 @@ if __name__ == '__main__':
           shutil.copyfile('./assets/enjoy.html', 'index.html')
           exit(0)
     else:
-        if args.max_paper_num != -1:
-            papers = papers[:args.max_paper_num]
         logger.info("Using OpenAI API as global LLM.")
         set_global_llm(api_key=args.openai_api_key, base_url=args.openai_api_base, model=args.model_name)
+    for paper in tqdm(papers, desc="Generating paper properties"):
+        paper.generate_base_properties()
+    papers.sort(key=lambda x: x.score, reverse=True)
+    if args.max_paper_num != -1:
+        papers = papers[:args.max_paper_num]
+    for paper in tqdm(papers, desc="Generating extended properties"):
+        paper.generate_extended_property()
+
     html = render_email(papers)
     with open('index.html', 'w') as f:
         f.write(html)

@@ -21,7 +21,6 @@ class ArxivPaper:
         self.introduction: str = ""
         self.conclusion: str = ""
         self.tex: Optional[dict[str,str]] = None
-        
         self.post_init()
     
     def post_init(self):
@@ -44,8 +43,15 @@ class ArxivPaper:
             match = re.search(r'\\section\{Conclusion\}.*?(\\section|\\end\{document\}|\\bibliography|\\appendix|$)', content, flags=re.DOTALL)
             if match:
                 self.conclusion = match.group(0)
+    
+    def generate_base_properties(self):
+        """生成affiliations, score等基本属性"""
+        self.affiliations = self.get_affiliations()
+        self.score = 1.0
+        if self.affiliations is not None:
+            self.score = self.get_score()
 
-    def generate_property(self):
+    def generate_extended_property(self):
         tldr_and_topic = self.get_tldr_and_topic()
         if tldr_and_topic is not None:
             try:
@@ -57,10 +63,6 @@ class ArxivPaper:
                 logger.warning(f'Could not parse {tldr_and_topic} to dict, display it in tldr directly.')
                 self.tldr = tldr_and_topic
                 self.topic = None
-        self.affiliations = self.get_affiliations()
-        self.score = 1
-        if self.affiliations is not None:
-            self.score = self.get_score()
         
 
     @property
@@ -240,7 +242,15 @@ class ArxivPaper:
                     {"role": "user", "content": prompt},
                 ]
             )
-
+            affiliations = llm.generate(
+                messages=[
+                    {
+                        'role': 'system',
+                        'content': 'You are an python list assistant. Check the python list format and make sure it is a valid python list. If it is not a valid python list, try to fix it. If it is a valid python list, just return it.',
+                    },
+                    {'role': 'user', 'content': affiliations},
+                ]
+            )
             try:
                 affiliations = re.search(r'\[.*?\]', affiliations, flags=re.DOTALL).group(0)
                 affiliations = literal_eval(affiliations)
