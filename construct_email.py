@@ -280,6 +280,25 @@ framework = """
     .browser-prompt a:hover {
       color: #f1c40f;
     }
+    .date-navigation {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .nav-link {
+      text-decoration: none;
+      color: #3498db;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 4px;
+      background-color: #f0f0f0;
+      transition: all 0.3s ease;
+    }
+    .nav-link:hover {
+      background-color: #3498db;
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -294,6 +313,10 @@ framework = """
   <div class="header">
     <h1>Daily Research Papers</h1>
     <p>Your daily dose of the latest research papers, curated just for you.</p>
+    <div class="date-navigation">
+      <a href="archive/__PREV_DATE_1__.html" class="nav-link">← Previous Day</a>
+      <a href="archive/__PREV_DATE_2__.html" class="nav-link">← 2 Days Ago</a>
+    </div>
   </div>
 
   <div>
@@ -464,8 +487,12 @@ def get_stars(score:float):
 
 def render_email(papers:list[ArxivPaper]):
     parts = []
+    today = datetime.datetime.now()
+    prev_date_1 = (today - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+    prev_date_2 = (today - datetime.timedelta(days=2)).strftime('%Y-%m-%d')
+    html = framework.replace('__PREV_DATE_1__', prev_date_1).replace('__PREV_DATE_2__', prev_date_2)
     if len(papers) == 0 :
-        return framework.replace('__CONTENT__', get_empty_html())
+        return html.replace('__CONTENT__', get_empty_html())
     
     for p in tqdm(papers,desc='Rendering Email'):
         rate = get_stars(p.score)
@@ -487,7 +514,7 @@ def render_email(papers:list[ArxivPaper]):
                                     code_url = p.code_url, affiliations = affiliations))
 
     content = '<br>' + '</br><br>'.join(parts) + '</br>'
-    return framework.replace('__CONTENT__', content)
+    return html.replace('__CONTENT__', content)
 
 def send_email(sender:str, receiver:str, password:str,smtp_server:str,smtp_port:int, html:str,):
     def _format_addr(s):
