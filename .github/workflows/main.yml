@@ -36,6 +36,19 @@ jobs:
           
         run: |
           uv run main.py
+          # Create archive directory if it doesn't exist
+          mkdir -p archive
+          
+          # Get current and previous dates
+          TODAY=$(date +'%Y-%m-%d')
+          YESTERDAY=$(date -d '1 day ago' +'%Y-%m-%d')
+          DAY_BEFORE_YESTERDAY=$(date -d '2 days ago' +'%Y-%m-%d')
+          
+          # Save current index.html with today's date
+          cp index.html archive/${TODAY}.html
+          
+          # Keep only the last 2 days of archives
+          find archive/ -type f -name '*.html' -mtime +2 -delete
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
