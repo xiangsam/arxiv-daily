@@ -10,6 +10,8 @@ from paper import ArxivPaper
 from llm import set_global_llm
 import feedparser
 import shutil
+from concurrent.futures import ThreadPoolExecutor
+import concurrent.futures
 
 load_dotenv(override=True)
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -60,7 +62,7 @@ def add_argument(*args, **kwargs):
     env_value = get_env(env_name)
     if env_value is not None:
         #convert env_value to the specified type
-        if kwargs.get('type') == bool:
+        if kwargs.get('type') is bool:
             env_value = env_value.lower() in ['true','1']
         else:
             env_value = kwargs.get('type')(env_value)
@@ -113,13 +115,24 @@ if __name__ == '__main__':
     else:
         logger.info("Using OpenAI API as global LLM.")
         set_global_llm(api_key=args.openai_api_key, base_url=args.openai_api_base, model=args.model_name)
-    for paper in tqdm(papers, desc="Generating paper properties"):
-        paper.generate_base_properties()
+    
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        futures = {executor.submit(paper.generate_base_properties): paper for paper in papers}
+        for future in tqdm(concurrent.futures.as_completed(futures), total=len(futures), desc="Generating paper properties"):
+            try:
+                future.result()
+            except Exception as e:
+                logger.error(f"Error generating properties for {futures[future]}: {e}")
     papers.sort(key=lambda x: x.score, reverse=True)
     if args.max_paper_num != -1:
         papers = papers[:args.max_paper_num]
-    for paper in tqdm(papers, desc="Generating extended properties"):
-        paper.generate_extended_property()
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        futures = {executor.submit(paper.generate_extended_property): paper for paper in papers}
+        for future in tqdm(concurrent.futures.as_completed(futures), total=len(futures), desc="Generating extended properties"):
+            try:
+                future.result()
+            except Exception as e:
+                logger.error(f"Error generating extended properties for {futures[future]}: {e}")
 
     html = render_email(papers)
     with open('index.html', 'w') as f:

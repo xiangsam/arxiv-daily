@@ -14,3 +14,7 @@ test.ipynb
 
 # debug files
 email.html
+index.html
+
+# macOS
+.DS_Store

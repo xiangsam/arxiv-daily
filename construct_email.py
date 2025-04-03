@@ -1,5 +1,4 @@
 from paper import ArxivPaper
-import math
 from tqdm import tqdm
 from email.header import Header
 from email.mime.text import MIMEText
@@ -9,6 +8,8 @@ import datetime
 from loguru import logger
 from typing import Optional
 from urllib.parse import quote_plus
+from concurrent.futures import ThreadPoolExecutor
+import concurrent.futures
 
 framework = """
 <!DOCTYPE HTML>
@@ -440,7 +441,7 @@ def get_empty_html():
   """
   return block_template
 
-def get_block_html(title:str, authors:str, rate:str, arxiv_id:str, abstract:str, topic:str, tldr: Optional[str], pdf_url: Optional[str], code_url: Optional[str]=None, affiliations: Optional[str]=None):
+def get_block_html(title:str, authors:str, rate:str, arxiv_id:str, abstract:str, topic: Optional[str], tldr: Optional[str], pdf_url: Optional[str], code_url: Optional[str]=None, affiliations: Optional[str]=None):
     ai_url = f'''https://kimi.moonshot.cn/_prefill_chat?prefill_prompt=请你阅读{title}这篇论文，链接是 {pdf_url} ，并回答以下问题：
 **Q1. 这篇论文试图解决什么问题？**
 **Q2. 这是一个新问题吗？如果有相关研究，请给出并总结方法**
@@ -484,6 +485,25 @@ def get_stars(score:float):
         half_star_num = int(2 * (score - full_star_num))
         return '<div class="star-wrapper">'+full_star * full_star_num + half_star * half_star_num + '</div>'
 
+def process_paper(paper:ArxivPaper):
+    """处理单个论文并返回HTML块"""
+    rate = get_stars(paper.score)
+    authors = [a.name for a in paper.authors[:5]]
+    authors = ', '.join(authors)
+    if len(paper.authors) > 5:
+        authors += ', ...'
+    if paper.affiliations is not None:
+        affiliations = paper.affiliations[:5]
+        affiliations = ', '.join(affiliations)
+        if len(paper.affiliations) > 5:
+            affiliations += ', ...'
+    else:
+        affiliations = 'Unknown Affiliation'
+    return get_block_html(title = paper.title, authors = authors, 
+                                    rate = rate, arxiv_id = paper.arxiv_id,
+                                    tldr = paper.tldr, abstract = paper.summary,
+                                    topic = paper.topic, pdf_url = paper.pdf_url, 
+                                    code_url = paper.code_url, affiliations = affiliations)
 
 def render_email(papers:list[ArxivPaper]):
     parts = []
@@ -494,25 +514,13 @@ def render_email(papers:list[ArxivPaper]):
     if len(papers) == 0 :
         return html.replace('__CONTENT__', get_empty_html())
     
-    for p in tqdm(papers,desc='Rendering Email'):
-        rate = get_stars(p.score)
-        authors = [a.name for a in p.authors[:5]]
-        authors = ', '.join(authors)
-        if len(p.authors) > 5:
-            authors += ', ...'
-        if p.affiliations is not None:
-            affiliations = p.affiliations[:5]
-            affiliations = ', '.join(affiliations)
-            if len(p.affiliations) > 5:
-                affiliations += ', ...'
-        else:
-            affiliations = 'Unknown Affiliation'
-        parts.append(get_block_html(title = p.title, authors = authors, 
-                                    rate = rate, arxiv_id = p.arxiv_id,
-                                    tldr = p.tldr, abstract = p.summary,
-                                    topic = p.topic, pdf_url = p.pdf_url, 
-                                    code_url = p.code_url, affiliations = affiliations))
-
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        futures = {executor.submit(process_paper, paper): paper for paper in papers}
+        for future in tqdm(concurrent.futures.as_completed(futures), total=len(papers), desc='Rendering HTML'):
+            try:
+                parts.append(future.result())
+            except Exception as e:
+                logger.error(f"论文处理出错: {e}")
     content = '<br>' + '</br><br>'.join(parts) + '</br>'
     return html.replace('__CONTENT__', content)
 
@@ -532,7 +540,7 @@ def send_email(sender:str, receiver:str, password:str,smtp_server:str,smtp_port:
         server.starttls()
     except Exception as e:
         logger.warning(f"Failed to use TLS. {e}")
-        logger.warning(f"Try to use SSL.")
+        logger.warning("Try to use SSL.")
         server = smtplib.SMTP_SSL(smtp_server, smtp_port)
 
     server.login(sender, password)
