@@ -24,15 +24,20 @@ framework = """
       margin: 0;
       padding: 20px;
       color: #333;
+      background-image: linear-gradient(120deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
     }
     .container {
       max-width: 800px;
       margin: 0 auto;
-      background-color: #fff;
+      background-color: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
       padding: 24px;
       position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.18);
     }
     .header {
       text-align: center;
@@ -52,21 +57,62 @@ framework = """
       margin-bottom: 24px;
       padding: 16px;
       border-radius: 8px;
-      background-color: #f9f9f9;
+      background-color: rgba(249, 249, 249, 0.9);
       border: 1px solid #ddd;
       opacity: 0;
       transform: translateY(20px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
+      transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      position: relative;
+    }
+    .paper-block:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     }
     .paper-block.visible {
       opacity: 1;
       transform: translateY(0);
     }
+    .paper-block::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+      box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+      opacity: 0;
+      transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+      z-index: -1;
+    }
+    .paper-block:hover::after {
+      opacity: 1;
+    }
     .paper-title {
       font-size: 24px;
       font-weight: 700;
       color: #2c3e50;
-      margin-bottom: 8px;
+      margin-bottom: 16px;
+      position: relative;
+      padding-bottom: 10px;
+      transition: color 0.3s ease;
+    }
+    .paper-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      height: 3px;
+      background: linear-gradient(90deg, #3498db, #9b59b6);
+      transition: width 0.3s ease;
+    }
+    .paper-block:hover .paper-title::after {
+      width: 100%;
+    }
+    .paper-block:hover .paper-title {
+      color: #3498db;
     }
     .paper-authors {
       font-size: 14px;
@@ -113,24 +159,33 @@ framework = """
       color: #fff;
       background-color: #3498db;
       padding: 8px 16px;
-      border-radius: 4px;
-      transition: background-color 0.3s ease;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);
+      position: relative;
+      overflow: hidden;
     }
     .paper-actions a:hover {
       background-color: #2980b9;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
     }
-    .heart-btn {
-      cursor: pointer;
-      font-size: 24px;
-      filter: grayscale(1) brightness(0.8);
-      transition: filter 0.3s ease, transform 0.2s ease;
+    .paper-actions a:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);
     }
-    .heart-btn:hover {
-      filter: grayscale(0.8) brightness(1);
-      transform: scale(1.1);
+    .paper-actions a::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.7s ease;
     }
-    .heart-btn.active {
-      filter: grayscale(0) drop-shadow(0 0 4px rgba(231, 76, 60, 0.5));
+    .paper-actions a:hover::before {
+      left: 100%;
     }
     .star-wrapper {
       font-size: 1.3em;
@@ -169,15 +224,23 @@ framework = """
       right: 20px;
       background-color: #3498db;
       color: #fff;
-      padding: 10px 16px;
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
       text-decoration: none;
-      font-size: 18px;
+      font-size: 24px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      transition: background-color 0.3s ease;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: visible;
     }
     .back-to-top:hover {
       background-color: #2980b9;
+      transform: translateY(-5px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
     }
     /* Toast 提示条样式 */
     .toast {
@@ -300,6 +363,20 @@ framework = """
       background-color: #3498db;
       color: white;
     }
+    .progress-container {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      height: 5px;
+      background: transparent;
+      z-index: 1000;
+    }
+    .progress-bar {
+      height: 5px;
+      background: linear-gradient(90deg, #3498db, #9b59b6);
+      width: 0%;
+      border-radius: 0 2px 2px 0;
+    }
   </style>
 </head>
 <body>
@@ -308,6 +385,10 @@ framework = """
 <div class="browser-prompt" id="browser-prompt">
   For the best experience, please open this page in your browser.
   <a href="https://xiangsam.github.io/arxiv-daily/">Open in Browser</a>
+</div>
+
+<div class="progress-container">
+  <div class="progress-bar" id="progress-bar"></div>
 </div>
 
 <div class="container">
@@ -384,12 +465,6 @@ framework = """
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
-  // 心形按钮点击提示
-  function toggleHeart(button) {
-    button.classList.toggle('active');
-    showToast('Added to favorites!');
-  }
-
   // 显示 Toast 提示
   function showToast(message) {
     const toast = document.getElementById('toast');
@@ -422,6 +497,23 @@ framework = """
     const url = iframe.src;
     if (url) {
       window.open(url, '_blank');
+    }
+  }
+  
+  // 滚动进度条
+  window.onscroll = function() {scrollFunction()};
+  
+  function scrollFunction() {
+    var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+    var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    var scrolled = (winScroll / height) * 100;
+    document.getElementById("progress-bar").style.width = scrolled + "%";
+    
+    // 显示/隐藏回到顶部按钮
+    if (winScroll > 300) {
+      backToTopButton.style.opacity = "1";
+    } else {
+      backToTopButton.style.opacity = "0";
     }
   }
 </script>
@@ -465,7 +557,6 @@ def get_block_html(title:str, authors:str, rate:str, arxiv_id:str, abstract:str,
             <a href="javascript:void(0)" onclick="openModal('{pdf_url}')">PDF</a>
             <a href="javascript:void(0)" onclick="openModal('{kimi}')">Kimi</a>
             {code}
-            <span class="heart-btn" onclick="toggleHeart(this)">❤️</span>
         </div>
     </div>
     """
@@ -514,13 +605,17 @@ def render_email(papers:list[ArxivPaper]):
     if len(papers) == 0 :
         return html.replace('__CONTENT__', get_empty_html())
     
+    # 使用线程池并行处理，但保持原始顺序
+    results = {}
     with ThreadPoolExecutor(max_workers=5) as executor:
-        futures = {executor.submit(process_paper, paper): paper for paper in papers}
+        futures = {executor.submit(process_paper, paper): i for i, paper in enumerate(papers)}
         for future in tqdm(concurrent.futures.as_completed(futures), total=len(papers), desc='Rendering HTML'):
             try:
-                parts.append(future.result())
+                index = futures[future]
+                results[index] = future.result()
             except Exception as e:
                 logger.error(f"论文处理出错: {e}")
+    parts = [results[i] for i in range(len(papers)) if i in results]
     content = '<br>' + '</br><br>'.join(parts) + '</br>'
     return html.replace('__CONTENT__', content)
 
