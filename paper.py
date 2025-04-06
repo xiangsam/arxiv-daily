@@ -182,7 +182,7 @@ class ArxivPaper:
         return file_contents
     
     def get_tldr_and_topic(self) -> Optional[str]:
-        prompt = """Given the title, abstract, introduction and the conclusion (if any) of a paper in latex format, generate a one-sentence TLDR summary. Additionally, propose one relevant search topic (e.g. LLM Position Embedding) related to the paper's category, __CATEGORY__.
+        prompt = """Given the title, abstract, introduction and the conclusion (if any) of a paper in latex format, generate a one-sentence TLDR summary in Chinese. Additionally, propose one relevant search topic (e.g. LLM Position Embedding) related to the paper's category in English, __CATEGORY__.
         
         \\title{__TITLE__}
         \\begin{abstract}__ABSTRACT__\\end{abstract}
@@ -212,6 +212,15 @@ class ArxivPaper:
                 {"role": "user", "content": prompt},
             ]
         )
+        res = llm.generate(
+                messages=[
+                    {
+                        'role': 'system',
+                        'content': "You are an python dict assistant. Check the python dict format and make sure it is a valid python dict with key \'tldr\' and \'topic\'. If it is not a valid python list, try to fix it. If it is a valid python list, just return it.",
+                    },
+                    {'role': 'user', 'content': res},
+                ]
+            )
         return res
 
     def get_affiliations(self) -> Optional[list[str]]:
