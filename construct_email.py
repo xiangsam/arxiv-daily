@@ -534,6 +534,7 @@ def get_empty_html():
   return block_template
 
 def get_block_html(title:str, authors:str, rate:str, arxiv_id:str, abstract:str, topic: Optional[str], tldr: Optional[str], pdf_url: Optional[str], code_url: Optional[str]=None, affiliations: Optional[str]=None):
+    title = title.replace('&', '')  # 移除特殊字符
     ai_url = f'''https://kimi.moonshot.cn/_prefill_chat?prefill_prompt=请你阅读{title}这篇论文，链接是 {pdf_url} ，并回答以下问题：
 **Q1. 这篇论文试图解决什么问题？**
 **Q2. 这是一个新问题吗？如果有相关研究，请给出并总结方法**
@@ -541,7 +542,7 @@ def get_block_html(title:str, authors:str, rate:str, arxiv_id:str, abstract:str,
 **Q4. 这篇论文提出了什么新的想法、方法或模型？与以前的方法相比，有什么特点和优势？**
 **Q5. 论文中的实验是如何设计的？**
 **Q6. 实验和结果是否很好地支持了需要验证的科学假设**
-回答时请先重复问题，再进行对应的回答。&system_prompt=你是一个学术专家，请你仔细阅读后续链接中的论文，并对用户的问题进行专业的回答，不要出现第一人称，当涉及到分点回答时，鼓励你以markdown格式输出。对于引用的内容，你需要及时在引用内容后给出参考链接。&send_immediately=true&force_search=true'''
+回答时请先重复问题，再进行对应的回答。&system_prompt=你是一个学术专家，请你仔细阅读后续链接中的论文，并对用户的问题进行专业的回答，不要出现第一人称，当涉及到分点回答时，鼓励你以markdown格式输出。对于引用的内容，你需要及时在引用内容后给出参考链接。&send_immediately=true&force_search=false'''
     ai_url = quote_plus(ai_url, safe='/:?=&')
     code = f"""<a href="javascript:void(0)" onclick="openModal('{code_url}')" class="paper-actions">Code</a>""" if code_url else ''
     block_template = """
