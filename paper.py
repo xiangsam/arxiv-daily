@@ -216,7 +216,7 @@ class ArxivPaper:
                 messages=[
                     {
                         'role': 'system',
-                        'content': "You are an python dict assistant. Check the python dict format and make sure it is a valid python dict with key \'tldr\' and \'topic\'. If it is not a valid python dict, try to fix it. If it is a valid python dict, just return it.",
+                        'content': "You are an python dict assistant. Check the python dict format and make sure it is a valid python dict with key \'tldr\' and \'topic\'. If it is not a valid python dict, try to fix it. If it is a valid python dict, just return it. Make sure your response could be directly parserd by python eval function.",
                     },
                     {'role': 'user', 'content': res},
                 ]
