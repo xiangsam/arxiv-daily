@@ -58,4 +58,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.TOKEN }}
-          publish_dir: .  # 确保包含根目录及其子目录（如archive）
+          publish_dir: .
+          keep_files: true
