@@ -305,7 +305,7 @@ class ArxivPaper:
             messages=[
                 {
                     "role": "system",
-                    "content": "You are an assistant who perfectly generates a score for the paper based on the affiliations of the authors. If the affiliations are not found, you should return 1. The score should be a number between 0 and 5, with 0.5 as the minimum step. Only retuen the score, do not return any intermediate results.",
+                    "content": "You are an assistant who perfectly generates a score for the paper based on the affiliations of the authors. You prefer papers about knowledge and analysis rather than simply application. If the affiliations are not found, you should return 1. The score should be a number between 0 and 5, with 0.5 as the minimum step. Only retuen the score, do not return any intermediate results.",
                 },
                 {"role": "user", "content": prompt},
             ]
