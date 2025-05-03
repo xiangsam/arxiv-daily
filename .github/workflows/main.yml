@@ -47,8 +47,13 @@ jobs:
           # Save current index.html with today's date
           cp index.html archive/${TODAY}.html
           
-          # Keep only the last 2 days of archives
-          find archive/ -type f -name '*.html' -mtime +2 -delete
+          # Remove files not matching the last three days
+          for file in archive/*.html; do
+            filename=$(basename "$file" .html)
+            if [[ "$filename" != "$TODAY" && "$filename" != "$YESTERDAY" && "$filename" != "$DAY_BEFORE_YESTERDAY" ]]; then
+              rm "$file"
+            fi
+          done
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
