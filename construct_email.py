@@ -396,8 +396,8 @@ framework = """
     <h1>Daily Research Papers</h1>
     <p>Your daily dose of the latest research papers, curated just for you.</p>
     <div class="date-navigation">
-      <a href="archive/__PREV_DATE_1__.html" class="nav-link">← Previous Day</a>
-      <a href="archive/__PREV_DATE_2__.html" class="nav-link">← 2 Days Ago</a>
+      <a href="/archive/__PREV_DATE_1__.html" class="nav-link">← Previous Day</a>
+      <a href="/archive/__PREV_DATE_2__.html" class="nav-link">← 2 Days Ago</a>
     </div>
   </div>
 
