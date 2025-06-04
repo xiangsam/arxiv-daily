@@ -1,3 +1,5 @@
+This repository is now archived. I developed a Chrome extension to beautify [Cool Paper](https://papers.cool/) and now use it to read papers instead, as it also greps conference papers. The extension can be found in my other repository.
+
 <h3 align="center">arXiv-Daily</h3>
 <p align="center"> Recommend new arxiv papers of your interest daily .
     <br> 
